@@ -18,9 +18,10 @@ Role Variables
   Otherwise, `groups` can be omitted and the following attributes can be defined in the partition object.
   * `name`: The name of the nodes within this group.
   * `cluster_name`: Optional.  An override for the top-level definition `openhpc_cluster_name`.
-  * `num_nodes`: Nodes within the group are assumed to number `0:num_nodes-1`.
+  * `min_nodes`: Minimum number (i.e. number of persistent) nodes within the group.
+  * `max_nodes`: Maximum number of nodes within the group.
   * `ram_mb`: Optional.  The physical RAM available in each server of this group.
-  Compute node hostnames are assumed to take the form: `cluster_name-group_name-{0..num_nodes-1}`
+  Compute node hostnames are assumed to take the form: `cluster_name-group_name-{0..max_nodes-1}`
 * `default`: Optional.  A boolean flag for whether this partion.  Valid settings are `YES` and `NO`.
 * `maxtime`: Optional.  A partition-specific time limit in hours, minutes and seconds.  The default value is
   `openhpc_job_maxtime`, which defaults to `24:00:00`.
@@ -82,7 +83,7 @@ To deploy, create a playbook which looks like this:
             - name: "compute"
               flavor: "compute-A"
               image: "CentOS7.5-OpenHPC"
-              num_nodes: 8
+              num_nodes: 8 # FIXME
               user: "centos"
           openhpc_cluster_name: openhpc
           openhpc_packages: []
@@ -104,7 +105,7 @@ To drain nodes, for example, before scaling down the cluster to 6 nodes:
           - name: "compute"
             flavor: "compute-A"
             image: "CentOS7.5-OpenHPC"
-            num_nodes: 6
+            num_nodes: 6 # FIXME
             user: "centos"
         openhpc_cluster_name: openhpc
       roles:
@@ -121,7 +122,7 @@ To drain nodes, for example, before scaling down the cluster to 6 nodes:
         # variable stores the list of instances to leave untouched.
         - name: Count the number of compute nodes per slurm partition
           set_fact:
-            desired_state: "{{ (( partition | first).nodes | map(attribute='name') | list )[:item.num_nodes] + desired_state | default([]) }}"
+            desired_state: "{{ (( partition | first).nodes | map(attribute='name') | list )[:item.num_nodes] + desired_state | default([]) }}" # FIXME
           when: partition | length > 0
           with_items: "{{ openhpc_slurm_partitions }}"
         - debug: var=desired_state
