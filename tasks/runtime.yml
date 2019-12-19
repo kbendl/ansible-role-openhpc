@@ -16,6 +16,11 @@
       - "slurm-example-configs-ohpc"
     state: present
 
+- name: Ensure selected OpenHPC packages are installed
+  yum:
+    name: "{{ openhpc_packages }}"
+    state: present
+
 - name: Ensure the Slurm spool directory exists
   file:
     path: /var/spool/slurm
@@ -90,9 +95,4 @@
     enabled: "{{ openhpc_slurm_service_enabled | bool }}"
     state: "{{ 'started' if openhpc_slurm_service_enabled | bool else 'stopped' }}"
 
-# Install OpenHPC runtime
-- name: Ensure selected OpenHPC packages are installed
-  yum:
-    name: "{{ openhpc_packages }}"
-    state: present
 ...
