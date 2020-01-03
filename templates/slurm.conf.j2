@@ -95,14 +95,25 @@ JobCompType=jobcomp/none
 #AccountingStorageUser=
 #
 # AUTOSCALING
-ResumeProgram=/etc/slurm/resumestub.sh
+# for testing purposes only:
+SuspendTime=120
+SuspendTimeout=300
+SuspendProgram=/etc/slurm/suspend.sh
+ResumeProgram=/etc/slurm/resume.sh
+ResumeTimeout=1200 # wait 20 minutes - our boot process takes ages!
+
+SlurmctldParameters=idle_on_node_suspend
+{% for part in openhpc_slurm_partitions %}
+SuspendExcNodes={% for group in part.get('groups', [part]) %}{{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-[0-{{group.min_nodes|int-1}}]{% if not loop.last %},{% endif %}{% endfor %} \
+{% endfor %}
+#BatchStartTimeout
 
 # COMPUTE NODES
 # OpenHPC default configuration
 PropagateResourceLimitsExcept=MEMLOCK
-# By default, SLURM will log to syslog, which is what we want
-#SlurmdLogFile=/var/log/slurm.log
-#SlurmctldLogFile=/var/log/slurmctld.log
+# use specific logs
+SlurmdLogFile=/var/log/slurm.log
+SlurmctldLogFile=/var/log/slurmctld.log
 AccountingStorageType=accounting_storage/filetxt
 Epilog=/etc/slurm/slurm.epilog.clean
 {% for part in openhpc_slurm_partitions %}
