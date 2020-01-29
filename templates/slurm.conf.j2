@@ -77,10 +77,10 @@ PreemptMode=SUSPEND,GANG
 # LOGGING
 # Silence warnings about configuration file mismatches.
 DebugFlags=NO_CONF_HASH
-SlurmctldDebug=3
-#SlurmctldLogFile=
-SlurmdDebug=3
-#SlurmdLogFile=
+SlurmctldDebug=debug5
+SlurmctldLogFile=/var/log/slurmctld.log
+SlurmdDebug=debug5
+SlurmdLogFile=/var/log/slurmd.log
 JobCompType=jobcomp/none
 #JobCompLoc=
 #
@@ -111,9 +111,6 @@ SuspendExcNodes={% for group in part.get('groups', [part]) %}{{group.cluster_nam
 # COMPUTE NODES
 # OpenHPC default configuration
 PropagateResourceLimitsExcept=MEMLOCK
-# use specific logs
-SlurmdLogFile=/var/log/slurm.log
-SlurmctldLogFile=/var/log/slurmctld.log
 AccountingStorageType=accounting_storage/filetxt
 Epilog=/etc/slurm/slurm.epilog.clean
 {% for part in openhpc_slurm_partitions %}
@@ -161,3 +158,4 @@ PartitionName={{part.name}} \
 # Want nodes that drop out of SLURM's configuration to be automatically 
 # returned to service when they come back.
 ReturnToService=2
+RebootProgram=/sbin/runreimage.sh
