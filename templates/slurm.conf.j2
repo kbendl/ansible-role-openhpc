@@ -43,7 +43,7 @@ ProctrackType=proctrack/pgid
 #TaskEpilog=
 #TaskPlugin=
 #TrackWCKey=no
-#TreeWidth=50
+TreeWidth=50
 #TmpFS=
 #UsePAM=
 #
@@ -116,7 +116,11 @@ Epilog=/etc/slurm/slurm.epilog.clean
 {% for part in openhpc_slurm_partitions %}
 {% for group in part.get('groups', [part]) %}
 # Define persistent nodes:
+{% if group.min_nodes > 1 %}
 NodeName={{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-[0-{{group.min_nodes|int-1}}] \
+{% else %}
+NodeName={{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-0 \
+{% endif %}
 {% if 'ram_mb' in group %}
     RealMemory={{group.ram_mb}} \
 {% endif %}
@@ -130,6 +134,7 @@ NodeName={{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-[0-
     ThreadsPerCore={{first_host_hv['ansible_processor_threads_per_core']}} \
 {% endif %}
     State=UNKNOWN
+{% if group.max_nodes > group.min_nodes %}
 # Define cloud nodes
 NodeName={{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-[{{group.min_nodes|int}}-{{group.max_nodes|int-1}}] \
 {% if 'ram_mb' in group %}
@@ -145,6 +150,7 @@ NodeName={{group.cluster_name|default(openhpc_cluster_name)}}-{{group.name}}-[{{
     ThreadsPerCore={{first_host_hv['ansible_processor_threads_per_core']}} \
 {% endif %}
     State=CLOUD
+{% endif %}
 {% endfor %}
 {% endfor %}
 
