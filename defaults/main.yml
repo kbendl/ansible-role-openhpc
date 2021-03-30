@@ -12,6 +12,7 @@ openhpc_resume_timeout: 300
 openhpc_retry_delay: 10
 openhpc_job_maxtime: 24:00:00
 openhpc_munge_key_path: ''
+openhpc_slurm_conf: {} # TODO: document - keys/values for slurm.conf
 
 # Accounting
 openhpc_slurm_accounting_storage_host: "{{ openhpc_slurmdbd_host }}"

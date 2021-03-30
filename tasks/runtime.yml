@@ -53,14 +53,32 @@
   notify: Restart slurmdbd service
   when: openhpc_enable.database | default(false) | bool
 
-- name: Apply customised SLURM configuration
+- name: Generate base slurm configuration
   template:
     src: slurm.conf.j2
+    dest: /tmp/slurm.conf
+    lstrip_blocks: true
+  delegate_to: localhost
+  run_once: true
+
+- name: Apply additional slurm configuration parameters
+  ini_file: # note this handily replaces #-commented out parameters with a non-commented line
+    path: /tmp/slurm.conf
+    section: null
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: true
+  loop: "{{ openhpc_slurm_conf | dict2items }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: Apply customised SLURM configuration
+  copy:
+    src: /tmp/slurm.conf
     dest: /etc/slurm/slurm.conf
     owner: root
     group: root
     mode: 0644
-    lstrip_blocks: true
   when: openhpc_enable.control | default(false) or not openhpc_slurm_configless
   notify:
     - Restart slurmctld service
