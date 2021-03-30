@@ -53,7 +53,7 @@
   notify: Restart slurmdbd service
   when: openhpc_enable.database | default(false) | bool
 
-- name: Generate base slurm configuration
+- name: Generate base slurm configuration # TODO: not idempotent
   template:
     src: slurm.conf.j2
     dest: /tmp/slurm.conf
@@ -61,7 +61,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Apply additional slurm configuration parameters
+- name: Apply additional slurm configuration parameters # TODO: not idempotent
   ini_file: # note this handily replaces #-commented out parameters with a non-commented line
     path: /tmp/slurm.conf
     section: null
