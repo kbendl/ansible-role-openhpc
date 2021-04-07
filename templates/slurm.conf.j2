@@ -46,8 +46,7 @@ ProctrackType=proctrack/pgid
 #TreeWidth=50
 #TmpFS=
 #UsePAM=
-{% if openhpc_slurm_configless %}SlurmctldParameters=enable_configless{% endif %}
-
+{% if _openhpc_slurm_ctld_params %}SlurmctldParameters={{ _openhpc_slurm_ctld_params | join (',')}}{% endif %}
 
 # TIMERS
 SlurmctldTimeout=300
@@ -146,3 +145,4 @@ NodeName={{ node }}
 # Want nodes that drop out of SLURM's configuration to be automatically
 # returned to service when they come back.
 ReturnToService=2
+{% if openhpc_reboot_program %}RebootProgram={{ openhpc_reboot_program }}{% endif %}

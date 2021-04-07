@@ -53,6 +53,16 @@
   notify: Restart slurmdbd service
   when: openhpc_enable.database | default(false) | bool
 
+- name: Build SlurmctldParameters
+  set_fact:
+    _openhpc_slurm_ctld_params: "{{ _openhpc_slurm_ctld_params + ([item.value] if lookup('vars', item.key) else []) }}"
+  loop: "{{ _openhpc_slurm_ctld_param_options | dict2items }}"
+  vars:
+    _openhpc_slurm_ctld_params: []
+    _openhpc_slurm_ctld_param_options:
+        openhpc_slurm_configless: enable_configless
+        openhpc_reboot_from_controller: reboot_from_controller
+
 - name: Apply customised SLURM configuration
   template:
     src: slurm.conf.j2
